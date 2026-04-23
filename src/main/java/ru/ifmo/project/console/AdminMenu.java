@@ -1,7 +1,9 @@
 package ru.ifmo.project.console;
 
+import ru.ifmo.project.model.Product;
 import ru.ifmo.project.model.Role;
 import ru.ifmo.project.model.User;
+import ru.ifmo.project.service.ProductService;
 import ru.ifmo.project.service.UserService;
 import ru.ifmo.project.util.PasswordUtil;
 
@@ -10,6 +12,7 @@ import java.util.Scanner;
 public class AdminMenu {
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
+    private final ProductService productService = new ProductService();
 
     public void show() {
         while (true) {
@@ -145,7 +148,94 @@ public class AdminMenu {
     }
 
     private void productManagement() {
-        System.out.println("Управление товарами (будет в шаге 27)");
+        while (true) {
+            System.out.println("\n--- ТОВАРЫ ---");
+            System.out.println("1. Список всех товаров");
+            System.out.println("2. Создать товар");
+            System.out.println("3. Обновить товар");
+            System.out.println("4. Удалить товар");
+            System.out.println("0. Назад");
+            System.out.print("Выбор: ");
+            int choice = readInt();
+            switch (choice) {
+                case 1:
+                    listProducts();
+                    break;
+                case 2:
+                    createProduct();
+                    break;
+                case 3:
+                    updateProduct();
+                    break;
+                case 4:
+                    deleteProduct();
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Неверный выбор");
+            }
+        }
+    }
+
+    private void listProducts() {
+        var products = productService.getAllProducts();
+        if (products.isEmpty()) {
+            System.out.println("Товаров нет.");
+        } else {
+            System.out.println("\nСПИСОК ТОВАРОВ:");
+            for (Product p : products) {
+                System.out.printf("%d. %s - %.2f руб. (в наличии: %d)\n", p.getId(), p.getName(), p.getPrice(), p.getStockQuantity());
+                System.out.println("   Описание: " + p.getDescription());
+            }
+        }
+        System.out.println("\nНажмите Enter...");
+        scanner.nextLine();
+    }
+
+    private void createProduct() {
+        System.out.print("Название: ");
+        String name = scanner.nextLine();
+        System.out.print("Цена: ");
+        double price = readDouble();
+        System.out.print("Описание: ");
+        String desc = scanner.nextLine();
+        System.out.print("Количество на складе: ");
+        int stock = readInt();
+        productService.createProduct(name, price, desc, stock);
+        System.out.println("Товар создан.");
+    }
+
+    private void updateProduct() {
+        System.out.print("ID товара для обновления: ");
+        Long id = readLong();
+        Product product = productService.findById(id);
+        if (product == null) {
+            System.out.println("Товар не найден.");
+            return;
+        }
+        System.out.println("Текущие данные: " + product);
+        System.out.print("Новое название (Enter - оставить): ");
+        String name = scanner.nextLine();
+        if (!name.isBlank()) product.setName(name);
+        System.out.print("Новая цена (0 - оставить): ");
+        double price = readDouble();
+        if (price > 0) product.setPrice(price);
+        System.out.print("Новое описание (Enter - оставить): ");
+        String desc = scanner.nextLine();
+        if (!desc.isBlank()) product.setDescription(desc);
+        System.out.print("Новый остаток (-1 - оставить): ");
+        int stock = readInt();
+        if (stock >= 0) product.setStockQuantity(stock);
+        productService.updateProduct(product);
+        System.out.println("Товар обновлён.");
+    }
+
+    private void deleteProduct() {
+        System.out.print("ID товара для удаления: ");
+        Long id = readLong();
+        productService.deleteProduct(id);
+        System.out.println("Товар удалён.");
     }
 
     private int readInt() {
@@ -162,6 +252,16 @@ public class AdminMenu {
         while (true) {
             try {
                 return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Введите число: ");
+            }
+        }
+    }
+
+    private double readDouble() {
+        while (true) {
+            try {
+                return Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.print("Введите число: ");
             }
