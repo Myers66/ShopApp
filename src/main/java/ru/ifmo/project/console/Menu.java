@@ -103,9 +103,7 @@ public class Menu {
                 break;
             case 2:
                 if (authService.getCurrentSession().getUser().getRole() == Role.ADMIN) {
-                    // TODO: после создания AdminMenu раскомментировать
-                    System.out.println("Админ-меню в разработке...");
-                    // new AdminMenu().show();
+                    new AdminMenu().show();
                 } else {
                     System.out.println("Нет прав");
                 }
