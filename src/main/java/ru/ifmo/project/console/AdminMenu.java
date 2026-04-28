@@ -154,6 +154,8 @@ public class AdminMenu {
             System.out.println("2. Создать товар");
             System.out.println("3. Обновить товар");
             System.out.println("4. Удалить товар");
+            System.out.println("5. Поиск товаров по имени");
+            System.out.println("6. Поиск товаров по диапазону цен");
             System.out.println("0. Назад");
             System.out.print("Выбор: ");
             int choice = readInt();
@@ -169,6 +171,12 @@ public class AdminMenu {
                     break;
                 case 4:
                     deleteProduct();
+                    break;
+                case 5:
+                    searchProductsByName();
+                    break;
+                case 6:
+                    searchProductsByPriceRange();
                     break;
                 case 0:
                     return;
@@ -236,6 +244,47 @@ public class AdminMenu {
         Long id = readLong();
         productService.deleteProduct(id);
         System.out.println("Товар удалён.");
+    }
+
+    private void searchProductsByName() {
+        System.out.print("Введите название (или часть названия): ");
+        String name = scanner.nextLine();
+        System.out.print("Искать точное совпадение? (y/n): ");
+        boolean exact = scanner.nextLine().equalsIgnoreCase("y");
+        var products = productService.findByName(name, exact);
+        if (products.isEmpty()) {
+            System.out.println("Товары не найдены.");
+        } else {
+            System.out.println("\nРЕЗУЛЬТАТЫ ПОИСКА:");
+            for (Product p : products) {
+                System.out.printf("%d. %s - %.2f руб. (остаток: %d)\n", p.getId(), p.getName(), p.getPrice(), p.getStockQuantity());
+                System.out.println("   Описание: " + p.getDescription());
+            }
+        }
+        System.out.println("\nНажмите Enter...");
+        scanner.nextLine();
+    }
+
+    private void searchProductsByPriceRange() {
+        System.out.print("Минимальная цена: ");
+        double min = readDouble();
+        System.out.print("Максимальная цена: ");
+        double max = readDouble();
+        if (min > max) {
+            System.out.println("Ошибка: минимальная цена больше максимальной.");
+        } else {
+            var products = productService.findByPriceRange(min, max);
+            if (products.isEmpty()) {
+                System.out.println("Товары в указанном диапазоне не найдены.");
+            } else {
+                System.out.println("\nТОВАРЫ В ДИАПАЗОНЕ ЦЕН [" + min + " - " + max + "]:");
+                for (Product p : products) {
+                    System.out.printf("%d. %s - %.2f руб. (остаток: %d)\n", p.getId(), p.getName(), p.getPrice(), p.getStockQuantity());
+                }
+            }
+        }
+        System.out.println("\nНажмите Enter...");
+        scanner.nextLine();
     }
 
     private int readInt() {

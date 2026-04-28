@@ -42,8 +42,8 @@ public class ProductService {
         productDao.delete(id);
     }
 
-    public List<Product> findByName(String name) {
-        return productDao.findByName(name);
+    public List<Product> findByName(String name, boolean exactMatch) {
+        return productDao.findByName(name, exactMatch);
     }
 
     public List<Product> findByPriceRange(double min, double max) {
