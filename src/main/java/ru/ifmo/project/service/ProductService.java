@@ -1,8 +1,10 @@
 package ru.ifmo.project.service;
 
+
 import ru.ifmo.project.dao.ProductDao;
 import ru.ifmo.project.dao.impl.ProductDaoImpl;
 import ru.ifmo.project.model.Product;
+import ru.ifmo.project.exception.DataAccessException;
 
 import java.util.List;
 
@@ -14,6 +16,12 @@ public class ProductService {
     }
 
     public Product createProduct(String name, double price, String description, int stockQuantity) {
+        if (price <= 0) {
+            throw new DataAccessException("Цена товара должна быть положительной");
+        }
+        if (stockQuantity < 0) {
+            throw new DataAccessException("Количество на складе не может быть отрицательным");
+        }
         Product product = new Product(name, price, description, stockQuantity);
         return productDao.save(product);
     }
