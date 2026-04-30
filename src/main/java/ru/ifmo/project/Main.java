@@ -5,7 +5,7 @@ import ru.ifmo.project.web.WebServer;
 
 public class Main {
     public static void main(String[] args) {
-        // запуск веб-сервера в отдельном потоке
+        // Запуск веб-сервера в отдельном потоке
         new Thread(() -> {
             try {
                 WebServer webServer = new WebServer(8080);
@@ -15,8 +15,8 @@ public class Main {
             }
         }).start();
 
-        // запуск консольного меню
-        Menu menu = new Menu();
-        menu.start();
+        // Запуск консольного меню
+        // Menu menu = new Menu();
+        // menu.start();
     }
 }
