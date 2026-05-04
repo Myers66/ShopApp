@@ -16,8 +16,14 @@ public class UserDaoImpl implements UserDao {
 
     private final Connection connection;
 
+    // Конструктор для реального использования (берёт соединение из DatabaseConnection)
     public UserDaoImpl() {
         this.connection = DatabaseConnection.getInstance().getConnection();
+    }
+
+    // Конструктор для тестов (позволяет передать своё соединение, например in-memory H2)
+    public UserDaoImpl(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
